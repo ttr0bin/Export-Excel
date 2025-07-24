@@ -1,5 +1,7 @@
 package likelion.excel.service;
 
+import likelion.excel.entity.User;
+import likelion.excel.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,43 +21,56 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ExcelService {
 
+    private final UserRepository userRepository;
+
     public Resource excelDownload() {
 
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("시트명");
+        Sheet sheet = workbook.createSheet("User");
 
+        int rowNum = 0;
         // 헤더 행 생성
-        Row headerRow = sheet.createRow(0);  // 0번째 행에 헤더 생성
-        String[] headers = {"순번", "이름", "나이", "성별", "연락처"};
+        Row headerRow = sheet.createRow(rowNum++);  // 0번째 행에 헤더 생성
+        String[] headers = {"id", "email", "password", "username"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
         }
 
         // 데이터 행 생성
-        Object[][] data = {
-                {1, "한국인", 35, "남", "010-0000-0000"},
-                {2, "박원희", 11, "여", "010-1234-0000"},
-                {3, "이국한", 23, "여", "010-5678-0000"},
-                {4, "김명희", 27, "여", "010-9010-0000"},
-                {5, "김철민", 29, "남", "010-8888-0000"},
-        };
+// 정적 데이터 prac
+// header : {"순번", "이름", "나이", "성별", "연락처"}
+//        Object[][] data = {
+//                {1, "한국인", 35, "남", "010-0000-0000"},
+//                {2, "박원희", 11, "여", "010-1234-0000"},
+//                {3, "이국한", 23, "여", "010-5678-0000"},
+//                {4, "김명희", 27, "여", "010-9010-0000"},
+//                {5, "김철민", 29, "남", "010-8888-0000"},
+//        };
+//        // Sheet 내에 데이터 행 구성
+//        for (int i = 0; i < data.length; i++) {
+//            Row row = sheet.createRow(i + 1);
+//            for (int j = 0; j < data[i].length; j++) {
+//                // 각 행의 셀 생성
+//                Cell cell = row.createCell(j);
+//
+//                // 각 행의 값 입력
+//                if (data[i][j] instanceof String) {
+//                    cell.setCellValue((String) data[i][j]);
+//                } // 문자 처리
+//                if (data[i][j] instanceof Integer) {
+//                    cell.setCellValue((Integer) data[i][j]);
+//                } // 숫자 처리
+//            }
+//        }
 
-        // Sheet 내에 데이터 행 구성
-        for (int i = 0; i < data.length; i++) {
-            Row row = sheet.createRow(i + 1);
-            for (int j = 0; j < data[i].length; j++) {
-                // 각 행의 셀 생성
-                Cell cell = row.createCell(j);
-
-                // 각 행의 값 입력
-                if (data[i][j] instanceof String) {
-                    cell.setCellValue((String) data[i][j]);
-                } // 문자 처리
-                if (data[i][j] instanceof Integer) {
-                    cell.setCellValue((Integer) data[i][j]);
-                } // 숫자 처리
-            }
+        List<User> userList = userRepository.findAll();
+        for (User user : userList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(user.getId());
+            row.createCell(2).setCellValue(user.getEmail());
+            row.createCell(3).setCellValue(user.getPassword());
+            row.createCell(1).setCellValue(user.getUsername());
         }
 
 
